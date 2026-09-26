@@ -1,21 +1,41 @@
-# Sessões de trabalho & priorização RICE — protótipo
+# Team Time Tracker — Notion Portfolio Demo
 
-Demonstração pública, viva no navegador, de dois sistemas que desenhei no trabalho: um rastreador de sessões de trabalho (iniciar / pausar / retomar / concluir) que mede tempo dedicado e custo estimado por projeto e por pessoa, e um framework de priorização RICE (Alcance × Impacto × Confiança ÷ Esforço) para ordenar um backlog técnico por valor gerado.
+A time-tracking and team-metrics system built in Notion for a small data team, rebuilt from scratch as a portfolio piece.
 
-Este repositório não reproduz nenhum sistema interno de empresa alguma — é uma recriação genérica, com dados fictícios, construída para portfólio. Tudo roda localmente no navegador (localStorage); nada é enviado a servidor algum.
+**Live demo (Notion):** https://safe-stallion-dd4.notion.site/Team-Time-Tracker-Portfolio-Demo-3de0bf7d46d3804f9c72ee0ff126f62a
 
-## Ver a demonstração ao vivo
+The published page can be duplicated as a template (Duplicate button, top right).
 
-https://poliana-betella.github.io/gestao-sessoes-rice-demo/
+> All names, projects and numbers are fictional. No real company, client or personal data is used.
 
-## O que este protótipo mostra
+## What it does
 
-Controle de sessão por estado (não iniciado / em andamento / pausado / concluído), com acúmulo correto de tempo entre pausas e retomadas. Custo estimado por projeto e por analista, a partir de um valor de hora configurável. Backlog priorizado automaticamente por score RICE, recalculado a cada item adicionado.
+- **Work sessions with pause and resume.** Each session has three buttons: **Start / Resume**, **Pause** and **Complete**. Only active time is counted; paused time is never billed.
+- **Automatic metrics.** Worked hours and cost (active minutes × the member's hourly rate) are formulas that roll up to projects and team members.
+- **RICE prioritization vs. real effort.** Projects are scored with RICE (Reach × Impact × Confidence ÷ Effort) using the *estimated* effort, and compared with the effort actually tracked ("84% of estimate", "124% of estimate").
 
-## Stack
+## Data model
 
-HTML, CSS e JavaScript puro (sem frameworks, sem backend) — propositalmente simples, para deixar a lógica visível.
+| Database | Key properties |
+|---|---|
+| **Work Sessions** | Session, Project (relation), Member (relation), Activity, Status, Started, Ended, Last Resumed, Accumulated Min, Pauses, Worked Hours, Duration, Cost, buttons |
+| **Projects** | Status, Squad, Reach, Impact, Confidence, Estimated Hours, RICE Score, Logged Hours, Total Cost, Effort vs Estimate, Team Size |
+| **Team** | Role, Squad, Hourly Rate, Logged Hours, Total Cost, Projects |
 
-## Contexto
+## How the timer works
 
-Autoria de um framework de priorização (RICE) documentado e aplicado para ordenar o backlog técnico de projetos por valor gerado, e desenho de um sistema de sessões de trabalho para medir tempo dedicado por projeto e por pessoa, usado como base para análise de custo operacional. Mais sobre isso em [poliana-betella.github.io/homepage](https://poliana-betella.github.io/homepage/#atuacao).
+| Button | What it changes |
+|---|---|
+| Start / Resume | Status → Running, Last Resumed → now, Started → now (only on the first click) |
+| Pause | Accumulated Min += minutes since Last Resumed, Pauses += 1, Status → Paused |
+| Complete | Accumulated Min += minutes since Last Resumed (if running), Status → Done, Ended → now |
+
+Worked Hours = (Accumulated Min + live minutes if running) ÷ 60
+
+## Views
+
+Active sessions · Projects by RICE · Team metrics · Session log grouped by project (with sums)
+
+## Tools
+
+Notion databases, relations, Formulas 2.0 and button automations.
